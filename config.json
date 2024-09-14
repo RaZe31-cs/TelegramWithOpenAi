@@ -1,0 +1,5 @@
+{
+    "messageStart": "Привет, {name}, как дела?",
+    "messageEnd": "Пока!",
+    "messageEndTime": 2
+}

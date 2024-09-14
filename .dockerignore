@@ -1,0 +1,8 @@
+__pycache__
+venv
+test.py
+data/__pycache__
+data/models/__pycache__
+.env
+Dockerfile
+compose.yaml
