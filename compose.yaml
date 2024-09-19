@@ -12,7 +12,7 @@ services:
   redis:
     image: "redis:alpine"
     volumes:
-      - /redis:/usr/local/etc/redis
+      - /redis:/data
   bot:
     environment: 
       REDIS_HOST: redis
@@ -30,4 +30,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - /bot:/usr/src/app/log/
-   
+    depends_on:
+      - postgresql
+      - redis
