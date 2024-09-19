@@ -1,5 +1,7 @@
 {
     "messageStart": "Привет, {name}, как дела?",
+    "messageStartPhoto": "start.jpg",
     "messageEnd": "Пока!",
+    "messageEndPhoto": "end.jpg",
     "messageEndTime": 2
 }

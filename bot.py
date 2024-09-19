@@ -1,6 +1,7 @@
 import asyncio
 from aiogram import F
 from aiogram import Bot, Dispatcher
+from aiogram.types.input_file import FSInputFile
 from aiogram.types import (
     CallbackQuery,
     Message,
@@ -29,7 +30,13 @@ async def start(message: Message):
         await createUser(message, r, client)
     else:
         await updateLastActivityUser(message, r)
-    await message.answer(r.get('messageStart').format(name=name))
+    m = r.get('messageStart').format(name=name)
+    pathToStartPhoto = 'images/' + r.get('messageStartPhoto')
+    logging.info(f'Check exist image path: {pathToStartPhoto, os.path.exists(pathToStartPhoto)}')
+    if pathToStartPhoto and os.path.exists(pathToStartPhoto):
+        await message.answer_photo(FSInputFile(pathToStartPhoto), caption=m)
+    else:
+        await message.answer(m)
     if int(r.hget(f'user:{message.from_user.id}', 'wait_end_message')) == 0:
         r.hset(f'user:{message.from_user.id}', 'wait_end_message', 1)
         asyncio.create_task(backgroundWaitEndMessage(
@@ -63,6 +70,6 @@ async def main():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='log/log.log', level="INFO")
+    logging.basicConfig(format='%(asctime)s;%(levelname)s;%(message)s', filename='log/log.log', level="INFO")
     global_init()
     asyncio.run(main())

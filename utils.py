@@ -10,6 +10,7 @@ from data.db_session import create_session
 from data.models.users import User
 from aiogram import Bot
 import asyncio
+from aiogram.types.input_file import FSInputFile
 
 async def initializeRedis(r: Redis):
     with open('config.json', 'r') as json_file:
@@ -83,7 +84,11 @@ async def backgroundWaitEndMessage(r: Redis, bot: Bot, id: int):
     while True:
         await asyncio.sleep(5)
         if time.time() - float(r.hget(f'user:{id}', 'last_activity')) > n:
-            await bot.send_message(id, m)
+            pathToEndPhoto = 'images/' + r.get('messageEndPhoto')
+            if pathToEndPhoto and os.path.exists(pathToEndPhoto):
+                await bot.send_photo(id, FSInputFile(pathToEndPhoto), caption=m)
+            else:
+                await bot.send_message(id, m)
             r.hset(f'user:{id}', 'wait_end_message', 0)
             break
 
@@ -108,7 +113,7 @@ async def checkWaitEndMessage(r: Redis, bot: Bot):
         users = s.query(User).all()
         for user in users:
             m = r.hget(f'user:{user.tg_id}', 'wait_end_message')
-            if int(m) == 1:
+            if m and int(m) == 1:
                 lastTime = r.hget(f'user:{user.tg_id}', 'last_activity')
                 if time.time() - float(lastTime) < 3600:
                     asyncio.create_task(backgroundWaitEndMessage(r, bot, user.tg_id))
